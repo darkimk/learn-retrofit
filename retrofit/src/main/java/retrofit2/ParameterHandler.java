@@ -25,6 +25,7 @@ import okhttp3.RequestBody;
 
 import static retrofit2.Utils.checkNotNull;
 
+//TODO 这个类的具体作用和逻辑待分析
 abstract class ParameterHandler<T> {
   abstract void apply(RequestBuilder builder, @Nullable T value) throws IOException;
 
