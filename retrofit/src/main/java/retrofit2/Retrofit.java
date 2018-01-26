@@ -67,9 +67,16 @@ public final class Retrofit {
 
     final okhttp3.Call.Factory callFactory;
     final HttpUrl baseUrl;
-    //TODO 这里为什么要用集合？默认的Converter?
+
+    /**
+     * 关于converterFactories和adapterFactories这两个变量为什么要用集合的形式而不是单一变量，均因为为各自的get方法返回值为
+     * null的时候，会跳过该Factory继续使用下一个Factory的get方法，直到找到合适的实现，若一直找不到，则会抛出异常。
+     * 参考BuiltInConverters
+     */
+
+    //默认的Converter参考为BuiltInConverters的实现
     final List<Converter.Factory> converterFactories;
-    //TODO 这里为什么要用集合？默认的CallAdapter为ExecutorCallAdapterFactory
+    //默认的CallAdapter为ExecutorCallAdapterFactory
     final List<CallAdapter.Factory> adapterFactories;
     final @Nullable
     Executor callbackExecutor;//Android默认为主线程回调,利用Handler

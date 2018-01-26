@@ -177,6 +177,7 @@ final class ServiceMethod<R, T> {
                         + Utils.getRawType(responseType).getName()
                         + "' is not a valid response body type. Did you mean ResponseBody?");
             }
+            //这里创建responseConverter
             responseConverter = createResponseConverter();
 
             for (Annotation annotation : methodAnnotations) {
