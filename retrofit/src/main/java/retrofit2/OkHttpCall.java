@@ -91,36 +91,38 @@ final class OkHttpCall<T> implements Call<T> {
 
     @Override
     public void enqueue(final Callback<T> callback) {
+        //检查传入的Callback是否为空，为空抛出异常
         checkNotNull(callback, "callback == null");
-
         okhttp3.Call call;
         Throwable failure;
-
         synchronized (this) {
+            //此OkHttpCall对象如果执行过，再次调用会抛出异常
+            //一般不会抛这个异常，因为每次都是创建一个新的OkHttpCall对象
+            //所以源代码中并没有executed=false这种设置，只有executed = true
             if (executed) throw new IllegalStateException("Already executed.");
             executed = true;
-
             call = rawCall;
             failure = creationFailure;
             if (call == null && failure == null) {
                 try {
+                    //此处创建原始的Call对象
                     call = rawCall = createRawCall();
                 } catch (Throwable t) {
+                    //如果为指定的三种异常，则抛出异常(为RxJava支持)
                     throwIfFatal(t);
+                    //变量赋值
                     failure = creationFailure = t;
                 }
             }
         }
-
         if (failure != null) {
+            //回调给用户设置的匿名接口
             callback.onFailure(this, failure);
             return;
         }
-
         if (canceled) {
             call.cancel();
         }
-
         call.enqueue(new okhttp3.Callback() {
             @Override
             public void onResponse(okhttp3.Call call, okhttp3.Response rawResponse)
