@@ -123,14 +123,17 @@ final class OkHttpCall<T> implements Call<T> {
         if (canceled) {
             call.cancel();
         }
+        //调用OkHttp的Call对象的enqueue方法
         call.enqueue(new okhttp3.Callback() {
             @Override
             public void onResponse(okhttp3.Call call, okhttp3.Response rawResponse)
                     throws IOException {
                 Response<T> response;
                 try {
+                    //解析响应参数
                     response = parseResponse(rawResponse);
                 } catch (Throwable e) {
+                    //如有解析异常则回调给callback
                     callFailure(e);
                     return;
                 }
