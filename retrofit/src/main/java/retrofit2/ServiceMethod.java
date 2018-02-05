@@ -170,6 +170,7 @@ final class ServiceMethod<R, T> {
         }
 
         public ServiceMethod build() {
+            //这里创建CallAdapter
             callAdapter = createCallAdapter();
             responseType = callAdapter.responseType();
             if (responseType == Response.class || responseType == okhttp3.Response.class) {
@@ -177,10 +178,11 @@ final class ServiceMethod<R, T> {
                         + Utils.getRawType(responseType).getName()
                         + "' is not a valid response body type. Did you mean ResponseBody?");
             }
-            //这里创建responseConverter
+            //这里创建Converter
             responseConverter = createResponseConverter();
 
             for (Annotation annotation : methodAnnotations) {
+                //解析校验方法中的注解
                 parseMethodAnnotation(annotation);
             }
 
@@ -234,16 +236,18 @@ final class ServiceMethod<R, T> {
 
         private CallAdapter<T, R> createCallAdapter() {
             Type returnType = method.getGenericReturnType();
+            //返回值校验
             if (Utils.hasUnresolvableType(returnType)) {
                 throw methodError(
                         "Method return type must not include a type variable or wildcard: %s", returnType);
             }
+            //返回值类型为Void抛出异常
             if (returnType == void.class) {
                 throw methodError("Service methods cannot return void.");
             }
             Annotation[] annotations = method.getAnnotations();
             try {
-                //noinspection unchecked
+                //看这里！！看这里！！看这里！！
                 return (CallAdapter<T, R>) retrofit.callAdapter(returnType, annotations);
             } catch (RuntimeException e) { // Wide exception range because factories are user code.
                 throw methodError(e, "Unable to create call adapter for %s", returnType);
